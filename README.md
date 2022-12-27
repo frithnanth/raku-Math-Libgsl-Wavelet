@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/frithnanth/raku-Math-Libgsl-Wavelet/actions/workflows/test.yml/badge.svg)](https://github.com/frithnanth/raku-Math-Libgsl-Wavelet/actions)
+
 ![Original data](examples/ecg.png) ![Filtered data](examples/ecg.processed.png)
 
 NAME
