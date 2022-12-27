@@ -1,0 +1,72 @@
+#!/usr/bin/env raku
+
+use Test;
+use Math::Libgsl::Constants;
+use Math::Libgsl::Matrix;
+use lib 'lib';
+use Math::Libgsl::Wavelet;
+
+constant \N    = 256;
+constant \kind =   4;
+my $*TOLERANCE = 10⁻¹⁰;
+
+my (@data, @fdata, @idata);
+for ^N X ^N -> ($i, $j) {
+  @data[$i * N + $j] = ($i * N + $j).Num / (N * N);
+}
+
+my Math::Libgsl::Matrix ($data, $fdata, $idata);
+$data  .= new: N,N;
+$fdata .= new: N,N;
+$idata .= new: N,N;
+
+for ^N X ^N -> ($i, $j) {
+  $data[$i;$j] = ($i * N + $j).Num / (N * N);
+}
+
+my Math::Libgsl::Wavelet $w .= new: DAUBECHIES, kind;
+isa-ok $w, Math::Libgsl::Wavelet, 'wavelet object creation';
+
+subtest 'standard form on array' => {
+  throws-like { @fdata = $w.forward2d(@data, N, N - 1) },
+             X::Multi::NoMatch,
+             :message(/'Cannot resolve caller forward2d'/),
+             'tda < data dimension';
+  lives-ok { @fdata = $w.forward2d(@data)  }, 'forward transform';
+  lives-ok { @idata = $w.inverse2d(@fdata) }, 'inverse transform';
+
+  ok ([&&] (@data[^(N * N)] Z≅ @idata[^(N * N)])), 'comparison with original values';
+}
+
+subtest 'standard form on matrix' => {
+  throws-like { my Math::Libgsl::Matrix $data1 .= new: N, N - 1;
+             $fdata = $w.forward2d($data1) },
+             X::Multi::NoMatch,
+             :message(/'Cannot resolve caller forward2d'/),
+             'non-square matrix';
+  throws-like { my Math::Libgsl::Matrix $data1 .= new: N - 1, N - 1;
+             $fdata = $w.forward2d($data1) },
+             X::Multi::NoMatch,
+             :message(/'Cannot resolve caller forward2d'/),
+             'dimension not a power of two';
+  lives-ok { $fdata = $w.forward2d($data) }, 'forward transform';
+  lives-ok { $idata = $w.inverse2d($fdata) }, 'inverse transform';
+
+  ok ([&&] (for ^N -> $i { $data.get-row($i) Z≅ $idata.get-row($i) })), 'comparison with original values';
+}
+
+subtest 'nonstandard form on array' => {
+  lives-ok { @fdata = $w.forward2d(@data,  :nonstandard) }, 'forward transform';
+  lives-ok { @idata = $w.inverse2d(@fdata, :nonstandard) }, 'inverse transform';
+
+  ok ([&&] (@data[^(N * N)] Z≅ @idata[^(N * N)])), 'comparison with original values';
+}
+
+subtest 'nonstandard form on matrix' => {
+  lives-ok { $fdata = $w.forward2d($data, :nonstandard) }, 'forward transform';
+  lives-ok { $idata = $w.inverse2d($fdata, :nonstandard) }, 'inverse transform';
+
+  ok ([&&] (for ^N -> $i { $data.get-row($i) Z≅ $idata.get-row($i) })), 'comparison with original values';
+}
+
+done-testing;

@@ -1,0 +1,32 @@
+#!/usr/bin/env raku
+
+use Test;
+use lib 'lib';
+use NativeCall;
+use Math::Libgsl::Raw::Wavelet;
+use Math::Libgsl::Constants;
+
+constant \N    = 256;
+constant \kind =   4;
+my $*TOLERANCE = 10⁻¹²;
+
+my gsl_wavelet $w = mgsl_wavelet_setup(DAUBECHIES, kind);
+isa-ok $w, Math::Libgsl::Raw::Wavelet::gsl_wavelet, 'setup wavelet structure';
+my gsl_wavelet_workspace $work = gsl_wavelet_workspace_alloc(N);
+isa-ok $work, Math::Libgsl::Raw::Wavelet::gsl_wavelet_workspace, 'allocate wavelet workspace';
+
+my $odata  = CArray[num64].allocate(N);
+my $idata = CArray[num64].allocate(N);
+for ^N -> $i {
+  $odata[$i] = $idata[$i] = $i.Num / N;
+}
+
+ok gsl_wavelet_transform_forward($w, $odata, 1, N, $work) == GSL_SUCCESS, 'forward transform';
+ok gsl_wavelet_transform_inverse($w, $odata, 1, N, $work) == GSL_SUCCESS, 'inverse transform';
+
+ok ([&&] ($odata[^N] Z≅ $idata[^N])), 'comparison with original values';
+
+lives-ok { gsl_wavelet_free($w) }, 'free wavelet structure';
+lives-ok { gsl_wavelet_workspace_free($work) }, 'free wavelet workspace';
+
+done-testing;

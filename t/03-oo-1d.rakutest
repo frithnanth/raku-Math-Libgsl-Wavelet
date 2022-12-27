@@ -1,0 +1,30 @@
+#!/usr/bin/env raku
+
+use Test;
+use Math::Libgsl::Constants;
+use lib 'lib';
+use Math::Libgsl::Wavelet;
+
+constant \N    = 256;
+constant \kind =   4;
+my $*TOLERANCE = 10⁻¹²;
+
+my (@data, @fdata, @idata);
+for ^N -> $i {
+  @data[$i] = $i.Num / N;
+}
+
+my Math::Libgsl::Wavelet $w .= new: DAUBECHIES, kind;
+isa-ok $w, Math::Libgsl::Wavelet, 'wavelet object creation';
+
+throws-like { @fdata = $w.forward1d(@data[^(N-1)], 1) },
+           X::TypeCheck::Binding::Parameter,
+           :message(/'Constraint type check failed'/),
+           'data size not a power of two';
+
+lives-ok { @fdata = $w.forward1d(@data ) }, 'forward transform';
+lives-ok { @idata = $w.inverse1d(@fdata) }, 'inverse transform';
+
+ok ([&&] (@data[^N] Z≅ @idata[^N])), 'comparison with original values';
+
+done-testing;
