@@ -30,7 +30,7 @@
   "resources": [
     "libraries/gslhelper"
   ],
-  "source-url": "",
+  "source-url": "https://github.com/frithnanth/raku-Math-Libgsl-Wavelet.git",
   "tags": [
     "math",
     "nativecall"
