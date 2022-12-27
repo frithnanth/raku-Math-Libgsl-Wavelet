@@ -16,7 +16,7 @@
   "builder": "Distribution::Builder::MakeFromJSON",
   "depends": [
     "Distribution::Builder::MakeFromJSON",
-    "Math::Libgsl::Constants",
+    "Math::Libgsl::Constants:ver<0.0.13+>",
     "Math::Libgsl::Matrix"
   ],
   "description": "An interface to libgsl, the Gnu Scientific Library - Wavelet Transform",
