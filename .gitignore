@@ -3,4 +3,4 @@
 /src/*.o
 /Makefile
 /resources/
-/Math-Libgsl-Histograms-*
+/Math-Libgsl-Wavelet-*
