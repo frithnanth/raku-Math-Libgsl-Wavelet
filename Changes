@@ -2,5 +2,8 @@ Revision history for Math-Libgsl-Wavelet
 
 {{$NEXT}}
 
+0.0.2  2023-01-06T16:12:17Z
+    - Adjust source LIB
+
 0.0.1  2022-12-27T13:57:56Z
     - Initial version
