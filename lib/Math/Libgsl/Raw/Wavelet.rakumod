@@ -5,7 +5,7 @@ unit module Math::Libgsl::Raw::Wavelet:ver<0.0.2>:auth<zef:FRITH>;
 use NativeCall;
 use Math::Libgsl::Raw::Matrix;
 
-constant GSLHELPER  = %?RESOURCES<libraries/gslhelper>.absolute;
+constant GSLHELPER  = %?RESOURCES<libraries/gslhelper>;
 
 sub LIB {
   run('/sbin/ldconfig', '-p', :chomp, :out)
